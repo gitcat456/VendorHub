@@ -36,7 +36,9 @@ LOGOUT_REDIRECT_URL = 'login'
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework',
     'users',
+    'products',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -57,10 +59,17 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'vendorHub.urls'
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Allow anyone to access API
+    ]
+}
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
