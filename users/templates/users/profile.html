@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block page_title %}My Profile{% endblock %}
+
+{% block page_subtitle %}Manage your account information{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="success-message">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <div class="avatar-circle">
+                    {{ user_profile.username|first|upper }}
+                </div>
+            </div>
+            <div class="profile-info">
+                <h2>{{ user_profile.username }}</h2>
+                <p class="profile-email">{{ user_profile.email }}</p>
+                <p class="profile-join-date">
+                    Member since: {{ user_profile.date_joined|date:"F j, Y" }}
+                </p>
+            </div>
+        </div>
+        
+        <div class="profile-details">
+            <div class="detail-group">
+                <label>Full Name</label>
+                <p class="detail-value">
+                    {% if user_profile.first_name or user_profile.last_name %}
+                        {{ user_profile.first_name }} {{ user_profile.last_name }}
+                    {% else %}
+                        <span class="text-muted">Not set</span>
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="detail-group">
+                <label>Email Address</label>
+                <p class="detail-value">{{ user_profile.email }}</p>
+            </div>
+            
+            <div class="detail-group">
+                <label>Last Login</label>
+                <p class="detail-value">{{ user_profile.last_login|date:"F j, Y g:i A" }}</p>
+            </div>
+            
+            <div class="detail-group">
+                <label>Account Status</label>
+                <p class="detail-value">
+                    <span class="status-badge status-active">Active</span>
+                </p>
+            </div>
+        </div>
+        
+        <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">Logout</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
