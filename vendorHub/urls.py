@@ -8,7 +8,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('users.urls')),
     path('api/', include('products.urls')),
+    path('interactions/', include('interactions.urls')),
+    
 ]
 
+#development only 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
