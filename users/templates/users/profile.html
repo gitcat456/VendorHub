@@ -2,70 +2,62 @@
 
 {% block title %}My Profile{% endblock %}
 
-{% block page_title %}My Profile{% endblock %}
-
-{% block page_subtitle %}Manage your account information{% endblock %}
-
 {% block content %}
-<div class="profile-container">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="success-message">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    
-    <div class="profile-card">
-        <div class="profile-header">
-            <div class="profile-avatar">
-                <div class="avatar-circle">
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="card">
+            <div class="card-body text-center p-5">
+                <div class="avatar-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-4" 
+                     style="width: 80px; height: 80px; font-size: 2rem; border-radius: 50%;">
                     {{ user_profile.username|first|upper }}
                 </div>
-            </div>
-            <div class="profile-info">
-                <h2>{{ user_profile.username }}</h2>
-                <p class="profile-email">{{ user_profile.email }}</p>
-                <p class="profile-join-date">
-                    Member since: {{ user_profile.date_joined|date:"F j, Y" }}
-                </p>
+                
+                <h3 class="mb-1">{{ user_profile.username }}</h3>
+                <p class="text-muted mb-4">{{ user_profile.email }}</p>
+                
+                <div class="list-group list-group-flush mb-4">
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Full Name</span>
+                        <span>
+                            {% if user_profile.first_name or user_profile.last_name %}
+                                {{ user_profile.first_name }} {{ user_profile.last_name }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Member Since</span>
+                        <span>{{ user_profile.date_joined|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Last Login</span>
+                        <span>{{ user_profile.last_login|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Status</span>
+                        <span class="badge bg-success">Active</span>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="#" class="btn btn-outline-primary">Edit Profile</a>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger">Logout</button>
+                    </form>
+                </div>
             </div>
         </div>
-        
-        <div class="profile-details">
-            <div class="detail-group">
-                <label>Full Name</label>
-                <p class="detail-value">
-                    {% if user_profile.first_name or user_profile.last_name %}
-                        {{ user_profile.first_name }} {{ user_profile.last_name }}
-                    {% else %}
-                        <span class="text-muted">Not set</span>
-                    {% endif %}
-                </p>
-            </div>
-            
-            <div class="detail-group">
-                <label>Email Address</label>
-                <p class="detail-value">{{ user_profile.email }}</p>
-            </div>
-            
-            <div class="detail-group">
-                <label>Last Login</label>
-                <p class="detail-value">{{ user_profile.last_login|date:"F j, Y g:i A" }}</p>
-            </div>
-            
-            <div class="detail-group">
-                <label>Account Status</label>
-                <p class="detail-value">
-                    <span class="status-badge status-active">Active</span>
-                </p>
-            </div>
-        </div>
-        
-        <form method="post" action="{% url 'logout' %}" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-secondary">Logout</button>
-        </form>
     </div>
 </div>
 {% endblock %}
