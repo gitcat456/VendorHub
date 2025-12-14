@@ -1,61 +1,74 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sign Up</title>
-    <style>
-        .error { color: red; }
-        .form-group { margin-bottom: 15px; }
-    </style>
-</head>
-<body>
-    <h1>Sign Up</h1>
-    
-    <form method="POST" action="">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <label>Username:</label>
-            <input type="text" name="username" value="{{ form.username.value|default:'' }}">
-            {% if form.username.errors %}
-                <div class="error">{{ form.username.errors }}</div>
-            {% endif %}
+{% extends 'base.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4>Sign Up</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            Please correct the errors below.
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Two columns on medium screens, one column on mobile -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Username *</label>
+                            <input type="text" name="username" class="form-control" value="{{ form.username.value|default:'' }}" required>
+                            {% if form.username.errors %}
+                                <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Email *</label>
+                            <input type="email" name="email" class="form-control" value="{{ form.email.value|default:'' }}" required>
+                            {% if form.email.errors %}
+                                <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" name="phone_number" class="form-control" value="{{ form.phone_number.value|default:'' }}">
+                            {% if form.phone_number.errors %}
+                                <div class="text-danger small mt-1">{{ form.phone_number.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Password *</label>
+                            <input type="password" name="password1" class="form-control" required>
+                            {% if form.password1.errors %}
+                                <div class="text-danger small mt-1">{{ form.password1.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Confirm Password *</label>
+                            <input type="password" name="password2" class="form-control" required>
+                            {% if form.password2.errors %}
+                                <div class="text-danger small mt-1">{{ form.password2.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">Sign Up</button>
+                        <a href="{% url 'login' %}" class="btn btn-link">Already have an account? Login</a>
+                    </div>
+                </form>
+            </div>
         </div>
-        
-        <div class="form-group">
-            <label>Email:</label>
-            <input type="email" name="email" value="{{ form.email.value|default:'' }}">
-            {% if form.email.errors %}
-                <div class="error">{{ form.email.errors }}</div>
-            {% endif %}
-        </div>
-        
-        <div class="form-group">
-            <label>Phone Number:</label>
-            <input type="text" name="phone_number" value="{{ form.phone_number.value|default:'' }}">
-            {% if form.phone_number.errors %}
-                <div class="error">{{ form.phone_number.errors }}</div>
-            {% endif %}
-        </div>
-        
-        <div class="form-group">
-            <label>Password:</label>
-            <input type="password" name="password1">
-            {% if form.password1.errors %}
-                <div class="error">{{ form.password1.errors }}</div>
-            {% endif %}
-        </div>
-        
-        <div class="form-group">
-            <label>Confirm Password:</label>
-            <input type="password" name="password2">
-            {% if form.password2.errors %}
-                <div class="error">{{ form.password2.errors }}</div>
-            {% endif %}
-        </div>
-        
-        <button type="submit">Sign Up</button>
-    </form>
-    
-    <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
-</body>
-</html>
+    </div>
+</div>
+{% endblock %}
