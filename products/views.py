@@ -1,11 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets 
-from .serializers import VendorProfileSerializer, CategorySerializer, ProductImageSerializer, ProductSerializer
-from .models import VendorProfile, Category, Product, ProductImage
-
-class VendorProfileViewSet(viewsets.ModelViewSet):  
-    queryset = VendorProfile.objects.all()
-    serializer_class = VendorProfileSerializer
+from .serializers import CategorySerializer, ProductSerializer
+from .models import Category, Product
 
 class CategoryViewSet(viewsets.ModelViewSet):  
     queryset = Category.objects.all()
@@ -21,7 +17,3 @@ class ProductViewSet(viewsets.ModelViewSet):
         if vendor_id:
             queryset = queryset.filter(vendor_id=vendor_id)
         return queryset
-
-class ProductImageViewSet(viewsets.ModelViewSet):  
-    queryset = ProductImage.objects.all()
-    serializer_class = ProductImageSerializer
