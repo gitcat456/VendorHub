@@ -1,64 +1,60 @@
 from rest_framework import serializers
-from .models import VendorProfile, Category, Product, ProductImage
-from django.conf import settings  
+from django.utils.timesince import timesince
+from django.contrib.auth import get_user_model
+from .models import Product, Category
 
-class VendorProfileSerializer(serializers.ModelSerializer):  
-    class Meta:
-        model = VendorProfile
-        fields = '__all__'
-        read_only_fields = ['vendor'] 
-        
-    def create(self, validated_data):
-        # Automatically set vendor to current logged-in user
-        request = self.context.get('request')
-        if request and hasattr(request, 'user'):
-            validated_data['vendor'] = request.user
-        return super().create(validated_data)
-        
+User = get_user_model()
+
 class CategorySerializer(serializers.ModelSerializer):
-    class Meta: 
-        model = Category
-        fields = '__all__' 
-        
-class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductImage
-        fields = '__all__'
-        
+        model = Category
+        fields = ['id', 'name']
 
+class VendorSerializer(serializers.ModelSerializer):
+    profile_pic = serializers.ImageField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'username',
+            'phone_number',
+            'email',
+            'profile_pic',
+            'location',
+        ]
+
+
+# Product serializer
 class ProductSerializer(serializers.ModelSerializer):
-    images = ProductImageSerializer(many=True, read_only=True)
-    category_name = serializers.CharField(source='category.name', read_only=True)
-    bss_name = serializers.CharField(source='vendor_profile.bss_name', read_only=True)
-    
+    category = CategorySerializer(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        source='category',
+        write_only=True
+    )
+    vendor = VendorSerializer(read_only=True)
+    time_since_posted = serializers.SerializerMethodField()
+
     class Meta:
         model = Product
         fields = [
-            'id', 'name', 'price', 'description', 'category',
-            'category_name', 'bss_name', 'created_at', 'images'
+            'id',
+            'name',
+            'price',
+            'description',
+            'image',
+            'category_id',
+            'category',
+            'vendor',
+            'time_since_posted',
         ]
-        
+
+    def get_time_since_posted(self, obj):
+        return timesince(obj.created_at) + " ago"
+
     def create(self, validated_data):
-        # Get the current user from request
         request = self.context.get('request')
-        if not request:
-            raise serializers.ValidationError("Request context is missing")
-            
-        user = request.user
-        
-        # Check if user has a vendor profile
-        if not hasattr(user, 'vendor_profile'):
-            # Create a vendor profile if it doesn't exist
-            vendor_profile = VendorProfile.objects.create(
-                vendor=user,
-                bss_name=f"{user.username}'s Business",
-                bss_location="Unknown"
-            )
-        else:
-            vendor_profile = user.vendor_profile
-        
-        # Add vendor_profile to validated data
-        validated_data['vendor_profile'] = vendor_profile
-        
-        # Create the product
-        return super().create(validated_data)
+        vendor = request.user
+        product = Product.objects.create(vendor=vendor, **validated_data)
+        return product
