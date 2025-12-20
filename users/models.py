@@ -7,8 +7,10 @@ class User(AbstractUser):
         ('vendor', 'Vendor'),
     )
     
-    phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=15, unique=True, blank=False, null=False)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='vendor')
+    profile_pic = models.ImageField(upload_to='vendor_profiles/', blank=True, null=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
     
     def __str__(self):
         return self.username
