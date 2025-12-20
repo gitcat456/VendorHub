@@ -47,6 +47,9 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'vendorHub.urls'
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',  # Allow anyone to access API
     ]
