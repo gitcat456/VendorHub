@@ -9,6 +9,8 @@ class ContactClickAdmin(admin.ModelAdmin):
         "product",
         "vendor",
         "created_at",
+        "ip_address",
+        "user_agent",
     )
     list_filter = ("contact_type", "created_at")
     search_fields = ("product__title", "vendor__username")
