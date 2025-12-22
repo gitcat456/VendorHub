@@ -3,6 +3,16 @@ from pathlib import Path
 import os
 from datetime import timedelta
 
+from decouple import config
+
+MPESA_CONSUMER_KEY = config("MPESA_CONSUMER_KEY")
+MPESA_CONSUMER_SECRET = config("MPESA_CONSUMER_SECRET")
+MPESA_SHORTCODE = config("MPESA_SHORTCODE", default="174379")
+MPESA_PASSKEY = config("MPESA_PASSKEY")
+MPESA_CALLBACK_URL = config("MPESA_CALLBACK_URL")
+MPESA_ENVIRONMENT = config("MPESA_ENVIRONMENT", default="sandbox")
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -34,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'interactions',
+    'subscriptions',
 ]
 #NB: Remove in  production
 CORS_ALLOW_ALL_ORIGINS = True
