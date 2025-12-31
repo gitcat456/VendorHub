@@ -1,21 +1,22 @@
-VendorHub Backend (Django + DRF)
-Overview
+VendorHub Backend
 
-This project is a Django REST API backend for a classifieds / marketplace platform (similar to Jiji).
+Django + Django REST Framework
 
-The system allows:
+VendorHub is an API-first backend for a classifieds/marketplace platform , built with scalability and clean architecture in mind. The frontend is fully decoupled and consumes this API independently.
 
-Vendors to create accounts and manage their profiles
+What it Does
 
-Vendors to post products/services for advertisement
+Vendors create accounts and manage profiles
 
-Public users to browse listings without authentication
+Vendors publish products or services
 
-Visitors to contact vendors directly via Call or WhatsApp
+Public users browse listings without authentication
 
-Logging of contact interactions for analytics
+Visitors contact vendors via Call or WhatsApp
 
-The backend is designed to be API-first, with frontend handled separately.
+All contact interactions are logged for analytics
+
+No in-app messaging. No payments. Fast, simple, and realistic.
 
 Tech Stack
 
@@ -23,130 +24,56 @@ Python
 
 Django
 
-Django REST Framework (DRF)
+Django REST Framework
 
-SQLite 
+SQLite
 
-Core Concepts
+Architecture Highlights
 
-Single User model
-Vendors are users differentiated by roles/flags (no separate Vendor model).
+Single User Model – vendors are users with role flags
 
-Public browsing
-Product listings are accessible without authentication.
+Public Browsing – listings are accessible without login
 
-No in-app messaging or payments
-Communication happens externally via phone or WhatsApp.
+JWT Authentication – required only for vendor actions
 
-Apps Structure
+External Communication – calls and WhatsApp handled outside the app
+
+App Structure
 backend/
-├── users/          # Authentication, roles, vendor profiles
-├── products/       # Product CRUD and categories
-├── interactions/   # Contact click logging (Call / WhatsApp)
-├── config/         # Project settings
-
-App Responsibilities
-Users App
-
-User registration and authentication
-
-Vendor role management
-
-Vendor profile data
-
-Products App
-
-Product creation, update, and deletion (vendors only)
-
-Product categories (e.g. Houses, Food, Electronics)
-
-Public product listing and detail endpoints
-
-Interactions App
-
-Logs contact actions when a user:
-
-Clicks Call
-
-Clicks WhatsApp
-
-Used for analytics (e.g. most contacted products)
-
-Authentication
-
-Vendors authenticate using JWT
-
-Public users do not require authentication to browse products
-
-Only authenticated vendors can create or manage products
+├── users/         # Auth, roles, vendor profiles
+├── products/      # Listings, categories
+├── interactions/  # Call / WhatsApp click logging
+├── config/        # Project settings
 
 Contact Interaction Logging
 
-When a visitor clicks a contact button:
-
-The frontend sends a request to the backend
-
-The backend logs:
+Each Call or WhatsApp click records:
 
 Product
 
 Vendor
 
-Contact type (call / whatsapp)
+Contact type
 
-Timestamp
+Timestamp (+ optional metadata)
 
-Optional metadata (IP, user agent)
-
-This helps track listing engagement without blocking user flow.
+This enables engagement analytics without interrupting user flow.
 
 Admin Panel
 
-The Django admin panel is used for:
+The Django admin is used to:
 
-Managing users and vendors
+Manage users and vendors
 
-Reviewing products
+Review products
 
-Viewing contact interaction logs
+Inspect interaction logs
 
-Setup Instructions
-
-Clone the repository
-
-Create and activate a virtual environment
-
-Install dependencies
-
-Run migrations
-
-Create a superuser
-
-Start the development server
-
-python manage.py makemigrations
+Getting Started
+git clone <repo>
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
-
-Future Improvements
-
-Advanced vendor analytics dashboard
-
-Product moderation workflow
-
-Search and filtering optimizations
-
-API versioning
-
-Rate limiting on interaction logging
-
-Purpose
-
-This backend is built as a capstone project, focusing on:
-
-Clean architecture
-
-Realistic system design
-
-Scalability and separation of concerns
