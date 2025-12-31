@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 import {
     Box,
     Container,
@@ -8,15 +9,14 @@ import {
     TextField,
     Button,
     Link,
-    Alert,
     CircularProgress
 } from '@mui/material';
 
 const Login = () => {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
-    const [error, setError] = useState('');
     const [formLoading, setFormLoading] = useState(false);
     const { login } = useAuth();
+    const { showNotification } = useNotification();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -25,14 +25,15 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
         setFormLoading(true);
 
         try {
             await login(credentials.username, credentials.password);
+            showNotification(`Welcome back, ${credentials.username}!`, 'success');
             navigate('/dashboard');
         } catch (err) {
-            setError(err.response?.data?.detail || 'Invalid username or password');
+            const errorMsg = err.response?.data?.detail || 'Invalid username or password';
+            showNotification(errorMsg, 'error');
         } finally {
             setFormLoading(false);
         }
@@ -52,39 +53,22 @@ const Login = () => {
                     Sign in to VendorHub
                 </Typography>
 
-                {error && <Alert severity="error" sx={{ width: '100%', mt: 2 }}>{error}</Alert>}
-
                 <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
                     <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="username"
-                        label="Username"
-                        name="username"
-                        autoComplete="username"
-                        autoFocus
-                        value={credentials.username}
-                        onChange={handleChange}
+                        margin="normal" required fullWidth
+                        id="username" label="Username" name="username"
+                        autoComplete="username" autoFocus
+                        value={credentials.username} onChange={handleChange}
                     />
                     <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type="password"
-                        id="password"
+                        margin="normal" required fullWidth
+                        name="password" label="Password" type="password" id="password"
                         autoComplete="current-password"
-                        value={credentials.password}
-                        onChange={handleChange}
+                        value={credentials.password} onChange={handleChange}
                     />
                     <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
-                        disabled={formLoading}
+                        type="submit" fullWidth variant="contained"
+                        sx={{ mt: 3, mb: 2 }} disabled={formLoading}
                     >
                         {formLoading ? <CircularProgress size={24} /> : 'Sign In'}
                     </Button>

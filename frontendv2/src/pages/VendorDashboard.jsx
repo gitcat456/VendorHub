@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     Container, Grid, Paper, Typography, Box, Avatar, Tabs, Tab,
     Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     TextField, MenuItem, IconButton, Dialog, DialogTitle, DialogContent, DialogActions,
-    CircularProgress, Alert, Card, CardMedia
+    CircularProgress, DialogContentText
 } from '@mui/material';
-import { Add, Delete, Logout, Edit, Payment, CheckCircle, CloudUpload, Close } from '@mui/icons-material';
+import { Add, Delete, Logout, Edit, Payment, CheckCircle, CloudUpload, Close, Warning } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { useProducts } from '../context/ProductContext';
+import { useNotification } from '../context/NotificationContext';
 import { updateProfile } from '../api/auth';
 import { initiatePayment } from '../api/subscriptions';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 const VendorDashboard = () => {
     const { user, logout } = useAuth();
     const { products, categories, addProduct, updateProduct, deleteProduct, loading } = useProducts();
+    const { showNotification } = useNotification();
     const [tabValue, setTabValue] = useState(0);
     const navigate = useNavigate();
 
@@ -22,6 +24,8 @@ const VendorDashboard = () => {
     const [openProfileModal, setOpenProfileModal] = useState(false);
     const [openSubscriptionModal, setOpenSubscriptionModal] = useState(false);
     const [openEditProductModal, setOpenEditProductModal] = useState(false);
+    const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
+    const [productToDelete, setProductToDelete] = useState(null);
 
     // Profile Edit State
     const [editProfileData, setEditProfileData] = useState({
@@ -36,7 +40,6 @@ const VendorDashboard = () => {
     // Subscription State
     const [subscriptionData, setSubscriptionData] = useState({ phone_number: user?.phone_number || '', amount: '1000' });
     const [paymentLoading, setPaymentLoading] = useState(false);
-    const [paymentStatus, setPaymentStatus] = useState(null);
 
     // Filter products for the logged-in vendor
     const myProducts = products.filter(p => p.vendor?.id === user?.id || p.vendor === user?.id);
@@ -50,6 +53,7 @@ const VendorDashboard = () => {
         image: null
     });
     const [newProductImagePreview, setNewProductImagePreview] = useState(null);
+    const [addProductLoading, setAddProductLoading] = useState(false);
 
     // Edit Product State
     const [editingProduct, setEditingProduct] = useState(null);
@@ -61,6 +65,7 @@ const VendorDashboard = () => {
         image: null
     });
     const [editProductImagePreview, setEditProductImagePreview] = useState(null);
+    const [updateProductLoading, setUpdateProductLoading] = useState(false);
 
     if (!user) {
         return <Container sx={{ py: 8, textAlign: 'center' }}><Typography>Please login to view dashboard</Typography></Container>;
@@ -87,6 +92,7 @@ const VendorDashboard = () => {
     // --- Product CRUD ---
     const handleAddProduct = async (e) => {
         e.preventDefault();
+        setAddProductLoading(true);
         const formData = new FormData();
         formData.append('name', newProduct.name);
         formData.append('price', newProduct.price);
@@ -101,10 +107,12 @@ const VendorDashboard = () => {
             setTabValue(0);
             setNewProduct({ name: '', price: '', category_id: '', description: '', image: null });
             setNewProductImagePreview(null);
-            alert('Product added successfully!');
+            showNotification('Product added successfully!', 'success');
         } catch (error) {
             console.error(error);
-            alert('Failed to add product. Please check inputs.');
+            showNotification('Failed to add product. Please check inputs.', 'error');
+        } finally {
+            setAddProductLoading(false);
         }
     };
 
@@ -123,6 +131,7 @@ const VendorDashboard = () => {
 
     const handleUpdateProductSubmit = async (e) => {
         e.preventDefault();
+        setUpdateProductLoading(true);
         const formData = new FormData();
         formData.append('name', editProductData.name);
         formData.append('price', editProductData.price);
@@ -136,10 +145,30 @@ const VendorDashboard = () => {
             await updateProduct(editingProduct.id, formData);
             setOpenEditProductModal(false);
             setEditingProduct(null);
-            alert('Product updated successfully!');
+            showNotification('Product updated successfully!', 'success');
         } catch (error) {
             console.error(error);
-            alert('Failed to update product.');
+            showNotification('Failed to update product.', 'error');
+        } finally {
+            setUpdateProductLoading(false);
+        }
+    };
+
+    const confirmDelete = (product) => {
+        setProductToDelete(product);
+        setOpenDeleteConfirm(true);
+    };
+
+    const handleDeleteProduct = async () => {
+        if (!productToDelete) return;
+        try {
+            await deleteProduct(productToDelete.id);
+            showNotification('Product deleted successfully', 'success');
+            setOpenDeleteConfirm(false);
+            setProductToDelete(null);
+        } catch (error) {
+            console.error(error);
+            showNotification('Failed to delete product', 'error');
         }
     };
 
@@ -158,11 +187,11 @@ const VendorDashboard = () => {
 
         try {
             await updateProfile(formData);
-            alert("Profile updated successfully! NOTE: Changes may require a re-login to fully reflect.");
+            showNotification("Profile updated! Re-login to fully see changes.", 'success');
             setOpenProfileModal(false);
         } catch (error) {
             console.error(error);
-            alert("Failed to update profile.");
+            showNotification("Failed to update profile.", 'error');
         } finally {
             setProfileLoading(false);
         }
@@ -171,23 +200,21 @@ const VendorDashboard = () => {
     // --- Subscription Management ---
     const handleSubscribe = async () => {
         if (!subscriptionData.phone_number) {
-            alert("Please enter a phone number");
+            showNotification("Please enter a phone number", 'warning');
             return;
         }
         setPaymentLoading(true);
-        setPaymentStatus(null);
         try {
             const response = await initiatePayment(subscriptionData.amount, subscriptionData.phone_number);
             if (response.success || response.ResponseCode === "0") {
-                setPaymentStatus('info');
-                alert(`Payment initiated! Please check your phone ${subscriptionData.phone_number} to enter M-Pesa PIN.`);
+                showNotification(`Payment initiated! Check phone ${subscriptionData.phone_number}`, 'info');
                 setOpenSubscriptionModal(false);
             } else {
-                alert("Payment initiation failed: " + (response.error || "Unknown error"));
+                showNotification("Payment initiation failed: " + (response.error || "Unknown error"), 'error');
             }
         } catch (error) {
             console.error(error);
-            alert("Error connecting to payment server.");
+            showNotification("Error connecting to payment server.", 'error');
         } finally {
             setPaymentLoading(false);
         }
@@ -306,7 +333,7 @@ const VendorDashboard = () => {
                                                     <IconButton color="primary" size="small" onClick={() => handleEditClick(product)} sx={{ mr: 1 }}>
                                                         <Edit />
                                                     </IconButton>
-                                                    <IconButton color="error" size="small" onClick={() => { if (window.confirm('Delete this product?')) deleteProduct(product.id); }}>
+                                                    <IconButton color="error" size="small" onClick={() => confirmDelete(product)}>
                                                         <Delete />
                                                     </IconButton>
                                                 </TableCell>
@@ -371,8 +398,8 @@ const VendorDashboard = () => {
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Button type="submit" variant="contained" size="large" fullWidth sx={{ py: 1.5, fontSize: '1.1rem' }}>
-                                        Post Ad Now
+                                    <Button type="submit" variant="contained" size="large" fullWidth sx={{ py: 1.5, fontSize: '1.1rem' }} disabled={addProductLoading}>
+                                        {addProductLoading ? <CircularProgress size={24} /> : 'Post Ad Now'}
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -432,8 +459,8 @@ const VendorDashboard = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenEditProductModal(false)}>Cancel</Button>
-                    <Button onClick={handleUpdateProductSubmit} variant="contained" color="primary">
-                        Update Listing
+                    <Button onClick={handleUpdateProductSubmit} variant="contained" color="primary" disabled={updateProductLoading}>
+                        {updateProductLoading ? <CircularProgress size={24} /> : 'Update Listing'}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -510,6 +537,27 @@ const VendorDashboard = () => {
                         startIcon={!paymentLoading && <Payment />}
                     >
                         {paymentLoading ? <CircularProgress size={24} color="inherit" /> : 'Pay Now'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog
+                open={openDeleteConfirm}
+                onClose={() => setOpenDeleteConfirm(false)}
+            >
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'error.main' }}>
+                    <Warning /> Confirm Deletion
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete this listing? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDeleteConfirm(false)}>Cancel</Button>
+                    <Button onClick={handleDeleteProduct} variant="contained" color="error" autoFocus>
+                        Delete
                     </Button>
                 </DialogActions>
             </Dialog>
