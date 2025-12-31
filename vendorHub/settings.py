@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 from datetime import timedelta
 
-from decouple import config
+from decouple import config,Csv
 
 MPESA_CONSUMER_KEY = config("MPESA_CONSUMER_KEY")
 MPESA_CONSUMER_SECRET = config("MPESA_CONSUMER_SECRET")
@@ -20,9 +20,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ul0(2f$tv6f27ls2mtk927@g^@o0hi1@$t8(2ma@rw6e+!j+ps'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config(
+    "ALLOWED_HOSTS",
+    default="localhost,127.0.0.1,vendorhub-iuzy.onrender.com",
+    cast=Csv()
+)
 
 AUTH_USER_MODEL = "users.User"
 
