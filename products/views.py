@@ -24,9 +24,7 @@ class ProductViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(vendor_id=vendor_id)
         return queryset
 
-    def perform_create(self, serializer):
-        serializer.save(vendor=self.request.user)
-
+    
 #Initial code implementation
 
 # class ProductViewSet(viewsets.ModelViewSet): 
