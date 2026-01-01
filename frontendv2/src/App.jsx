@@ -11,27 +11,31 @@ import { AuthProvider } from './context/AuthContext';
 import { ProductProvider } from './context/ProductContext';
 import theme from './theme/muiTheme';
 
+import { NotificationProvider } from './context/NotificationContext';
+
 function App() {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <AuthProvider>
-                <ProductProvider>
-                    <Router>
-                        <MainLayout>
-                            <Routes>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/listing/:id" element={<ListingDetails />} />
-                                <Route path="/search" element={<SearchResults />} />
-                                <Route path="/category/:id" element={<SearchResults />} />
-                                <Route path="/login" element={<Login />} />
-                                <Route path="/signup" element={<Signup />} />
-                                <Route path="/dashboard" element={<VendorDashboard />} />
-                            </Routes>
-                        </MainLayout>
-                    </Router>
-                </ProductProvider>
-            </AuthProvider>
+            <NotificationProvider>
+                <AuthProvider>
+                    <ProductProvider>
+                        <Router>
+                            <MainLayout>
+                                <Routes>
+                                    <Route path="/" element={<Home />} />
+                                    <Route path="/listing/:id" element={<ListingDetails />} />
+                                    <Route path="/search" element={<SearchResults />} />
+                                    <Route path="/category/:id" element={<SearchResults />} />
+                                    <Route path="/login" element={<Login />} />
+                                    <Route path="/signup" element={<Signup />} />
+                                    <Route path="/dashboard" element={<VendorDashboard />} />
+                                </Routes>
+                            </MainLayout>
+                        </Router>
+                    </ProductProvider>
+                </AuthProvider>
+            </NotificationProvider>
         </ThemeProvider>
     );
 }

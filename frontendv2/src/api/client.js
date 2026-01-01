@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const client = axios.create({
-    baseURL: 'http://127.0.0.1:8000/',
+    baseURL: 'https://vendorhub-iuzy.onrender.com/',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -32,7 +32,7 @@ client.interceptors.response.use(
             if (refreshToken) {
                 try {
                     // Call refresh endpoint
-                    const response = await axios.post('http://127.0.0.1:8000/refresh/', {
+                    const response = await axios.post('https://vendorhub-iuzy.onrender.com/refresh/', {
                         refresh: refreshToken
                     });
 

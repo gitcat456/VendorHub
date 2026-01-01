@@ -31,6 +31,7 @@ const Header = () => {
     const handleLogout = () => {
         handleCloseUserMenu();
         logout();
+        navigate('/');
     };
 
     return (
