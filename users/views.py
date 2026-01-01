@@ -6,7 +6,7 @@ from .serializers import RegisterSerializer, ProfileSerializer
 from django.shortcuts import redirect
 
 def home(request):
-    return redirect('api/users/products/')
+    return redirect('api/products/')
 
 class SignupAPI(APIView):
     def post(self, request):
