@@ -3,6 +3,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .serializers import RegisterSerializer, ProfileSerializer
+from django.shortcuts import redirect
+
+def home(request):
+    return redirect('api/users/signup')
 
 class SignupAPI(APIView):
     def post(self, request):
