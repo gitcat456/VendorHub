@@ -11,10 +11,10 @@ MPESA_SHORTCODE = config("MPESA_SHORTCODE", default="174379")
 MPESA_PASSKEY = config("MPESA_PASSKEY")
 MPESA_CALLBACK_URL = config("MPESA_CALLBACK_URL")
 MPESA_ENVIRONMENT = config("MPESA_ENVIRONMENT", default="sandbox")
-POSTGRES_HOST = config("POSTGRES_HOST", default="localhost")
-POSTGRES_PORT = config("POSTGRES_PORT", default="5432")
-POSTGRES_USER = config("POSTGRES_USER", default="postgres")
-POSTGRES_PASSWORD = config("POSTGRES_PASSWORD", default="postgres")
+POSTGRES_HOST = config("POSTGRES_HOST")
+POSTGRES_PORT = config("POSTGRES_PORT")
+POSTGRES_USER = config("POSTGRES_USER")
+POSTGRES_PASSWORD = config("POSTGRES_PASSWORD")
 POSTGRES_DB = config("POSTGRES_DB")
 
 
@@ -118,7 +118,7 @@ DATABASES = {
         "User": POSTGRES_USER,
         "Password": POSTGRES_PASSWORD,
         "Host": POSTGRES_HOST,
-        "Port": POSTGRES_PORT   
+        "PORT": config("POSTGRES_PORT", default=5432, cast=int),  
     }
 }
 
