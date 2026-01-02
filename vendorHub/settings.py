@@ -21,11 +21,8 @@ POSTGRES_DB = config("POSTGRES_DB")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ul0(2f$tv6f27ls2mtk927@g^@o0hi1@$t8(2ma@rw6e+!j+ps'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = config('SECRET_KEY')
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS",
@@ -63,8 +60,30 @@ INSTALLED_APPS = [
     'interactions',
     'subscriptions',
 ]
-#NB: Remove in  production
-CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "https://reliable-tartufo-74781f.netlify.app",
+    "https://vendorhub-iuzy.onrender.com",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# CSRF Settings
+CSRF_TRUSTED_ORIGINS = [
+    "https://reliable-tartufo-74781f.netlify.app",
+    "https://vendorhub-iuzy.onrender.com",
+]
+
+# For local development
+if DEBUG:
+    CORS_ALLOWED_ORIGINS += [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+    CSRF_TRUSTED_ORIGINS += [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -115,10 +134,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': POSTGRES_DB,
-        "User": POSTGRES_USER,
-        "Password": POSTGRES_PASSWORD,
-        "Host": POSTGRES_HOST,
-        "PORT": config("POSTGRES_PORT", default=5432, cast=int),  
+        "USER": POSTGRES_USER,
+        "PASSWORD": POSTGRES_PASSWORD,
+        "HOST": POSTGRES_HOST,
+        "PORT": POSTGRES_PORT, 
     }
 }
 
