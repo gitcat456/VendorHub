@@ -11,11 +11,11 @@ MPESA_SHORTCODE = config("MPESA_SHORTCODE", default="174379")
 MPESA_PASSKEY = config("MPESA_PASSKEY")
 MPESA_CALLBACK_URL = config("MPESA_CALLBACK_URL")
 MPESA_ENVIRONMENT = config("MPESA_ENVIRONMENT", default="sandbox")
-MYSQL_HOST = config("MYSQL_HOST", default="localhost")
-MYSQL_PORT = config("MYSQL_PORT", default="3306")
-MYSQL_USER = config("MYSQL_USER", default="root")
-MYSQL_PASSWORD = config("MYSQL_PASSWORD", default="")
-MYSQL_DB = config("MYSQL_DB")
+POSTGRES_HOST = config("POSTGRES_HOST", default="localhost")
+POSTGRES_PORT = config("POSTGRES_PORT", default="5432")
+POSTGRES_USER = config("POSTGRES_USER", default="postgres")
+POSTGRES_PASSWORD = config("POSTGRES_PASSWORD", default="postgres")
+POSTGRES_DB = config("POSTGRES_DB")
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -113,12 +113,12 @@ WSGI_APPLICATION = 'vendorHub.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': MYSQL_DB,
-        "User": MYSQL_USER,
-        "Password": MYSQL_PASSWORD,
-        "Host": MYSQL_HOST,
-        "Port": MYSQL_PORT   
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': POSTGRES_DB,
+        "User": POSTGRES_USER,
+        "Password": POSTGRES_PASSWORD,
+        "Host": POSTGRES_HOST,
+        "Port": POSTGRES_PORT   
     }
 }
 
