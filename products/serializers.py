@@ -6,9 +6,14 @@ from .models import Product, Category
 User = get_user_model()
 
 class CategorySerializer(serializers.ModelSerializer):
+    children = serializers.SerializerMethodField()
+    
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'parent', 'children']
+
+    def get_children(self, obj):
+        return CategorySerializer(obj.children, many=True).data
 
 class VendorSerializer(serializers.ModelSerializer):
     profile_pic = serializers.ImageField(read_only=True)
